@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<exam>
+    <question contributor="Victor Yang">
+        <answer>onResume()</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>When activity is no longer visible to the user</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>onStop()</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>Landscape layout</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>Used to debug a program</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>action</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>extras</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>ACTION_GET_CONTENT</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>All of the Above</answer>
+    </question>
+    <question contributor="Victor Yang">
+        <answer>eXtensible Markup Language</answer>
+    </question>
+</exam>

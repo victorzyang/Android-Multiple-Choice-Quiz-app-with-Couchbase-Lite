@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<exam>
+    <email>victor.yang2016@gmail.com</email>
+    <question contributor="Victor Yang">
+        <!--in above line, attribute name is 'contributor', attribute value is 'Victor Yang'-->
+        <question_text>
+            Which of these callbacks does onPause() always follow?
+        </question_text>
+        <option>onCreate()</option>
+        <option>onStart()</option>
+        <option>onResume()</option>
+        <option>onStop()</option>
+        <option>onDestroy()</option>
+    </question>
+    <!--Option 3 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            When does onStop() get called?
+        </question_text>
+        <option>When activity's UI is being inflated</option>
+        <option>When activity comes to the foreground</option>
+        <option>When an interruptive event occurs</option>
+        <option>When activity is no longer visible to the user</option>
+        <option>When activity is terminating</option>
+    </question>
+    <!--Option 4 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            When does the onSaveInstanceState(Bundle) method get called?
+        </question_text>
+        <option>onCreate()</option>
+        <option>onStart()</option>
+        <option>onResume()</option>
+        <option>onStop()</option>
+        <option>onDestroy()</option>
+    </question>
+    <!--Option 4 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            Which of the following is NOT required to save an activity state?
+        </question_text>
+        <option>Bundles</option>
+        <option>onSaveInstanceState(Bundle) method</option>
+        <option>Landscape layout</option>
+        <option>All of the above</option>
+        <option>None of the above</option>
+    </question>
+    <!--Option 3 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            What is log message in android?
+        </question_text>
+        <option>Used to debug a program</option>
+        <option>Same as printf()</option>
+        <option>Same as Toast()</option>
+        <option>All of the Above</option>
+        <option>None of the Above</option>
+    </question>
+    <!--Option 1 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            Which of the following is NOT a secondary attribute in an intent?
+        </question_text>
+        <option>category</option>
+        <option>action</option>
+        <option>type</option>
+        <option>component</option>
+        <option>extras</option>
+    </question>
+    <!--Option 2 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            Which of the following pieces of information is NOT used for Intent resolutions?
+        </question_text>
+        <option>category</option>
+        <option>action</option>
+        <option>type</option>
+        <option>extras</option>
+        <option>None of the above</option>
+    </question>
+    <!--Option 4 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            Which standard activity action allows user to select a particular kind of data and return it
+        </question_text>
+        <option>ACTION_VIEW</option>
+        <option>ACTION_CHOOSER</option>
+        <option>ACTION_INSERT_OR_EDIT</option>
+        <option>ACTION_PICK_ACTIVITY</option>
+        <option>ACTION_GET_CONTENT</option>
+    </question>
+    <!--ACTION_GET_CONTENT is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            What are the layouts available in android?
+        </question_text>
+        <option>Linear Layout</option>
+        <option>Frame Layout</option>
+        <option>Table Layout</option>
+        <option>Relative Layout</option>
+        <option>All of the Above</option>
+    </question>
+    <!--Option 5 is correct answer-->
+
+    <question contributor="Victor Yang">
+        <question_text>
+            What does XML stand for?
+        </question_text>
+        <option>eXtensible Markup Language</option>
+        <option>X-Markup Language</option>
+        <option>eXtra Modern Link</option>
+        <option>Example Markup Language</option>
+        <option>None of the Above</option>
+    </question>
+    <!--Option 1 is correct answer-->
+
+</exam>

@@ -49,6 +49,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -110,7 +111,37 @@ public class MainActivity extends AppCompatActivity {
         cfg.setDirectory(cntx.getFilesDir().getAbsolutePath()); //Do I need to have this line?
         database = null;
         try {
-            database = new Database(  "testDb", cfg);
+            database = new Database(  "testDb2", cfg);
+            MutableDocument mutableDoc = //test
+                    new MutableDocument().setFloat("version", 2.0f)
+                            .setString("type", "SDK");
+            database.save(mutableDoc);
+
+            /*Document document =
+                    database.getDocument(mutableDoc.getId());*/
+            Log.i(TAG, "I LOVE MISS KOBAYASHI");
+
+            //Log.i(TAG, "document.getString() is: " + document.getString("type")); //this works
+
+            ResultSet rs =
+                    QueryBuilder.select(
+                            SelectResult.property("type"),
+                            SelectResult.property("version"))
+                            .from(DataSource.database(database))
+                            .where(Expression.property("type").equalTo(Expression.string("SDK")))
+                            .execute();
+
+            for (Result result : rs) {
+                Log.i(TAG, String.format("type is -> %s", result.getString("type")));
+                Log.i(TAG, String.format("version is -> %s", result.getFloat("version")));
+            }
+
+            /*List<Result> listOfResults = rs.allResults();
+
+            Log.i(TAG,
+                    "listOfResults[0].toList() is: " +
+                            listOfResults.get(0).toList()/*.getKeys()*/ /*+ ", listOfResults.get(0).toList().get(0) is: "
+                            + listOfResults.get(0).toList().get(0));*/
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
@@ -303,22 +334,40 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i(TAG, "Question Table button clicked");
 
-                Query query = QueryBuilder
+                /*Query query = QueryBuilder
                         //.select(SelectResult.all()) //is there something wrong with SelectResult.all()?
                         .select(SelectResult.all())
                         .from(DataSource.database(database))
-                        .where(Expression.property("document_type").equalTo(Expression.string("questions")));
+                        .where(Expression.property("document_type").equalTo(Expression.string("questions")));*/
 
                 try {
-                    ResultSet rs = query.execute(); //is there something wrong with query.execute()?
-                    Log.i(TAG, "rs is: " + rs);
+                    ResultSet rs = QueryBuilder
+                            .select(
+                                    SelectResult.property("submission_email"),
+                                    SelectResult.property("questions"))
+                            .from(DataSource.database(database))
+                            .where(Expression.property("document_type").equalTo(Expression.string("questions")))
+                            .execute(); //is there something wrong with query.execute()?
+                    //Log.i(TAG, "rs.allResults().get(0) is: " + rs.allResults().get(0));
+                    //Log.i(TAG, "submission_email for rs.allResults().get(0) is: " + rs.allResults().get(0).getString("submission_email"));
                     StringBuffer buffer = new StringBuffer();
-                    for (Result result : rs) {
-                        Log.i(TAG, "result is: " + result);
+                    Log.i(TAG, "LOU IS THE BEST");
+                    for (Result result : rs.allResults()) {
+                        /*Log.i(TAG, "result is: " + result);
+                        buffer.append("Document type: " + result.getString("document_type") + "\n");
+                        Log.i(TAG, "Document type is: " + result.getString("document_type"));*/
                         buffer.append("Submission Email: " + result.getString("submission_email") + "\n");
                         Log.i(TAG, "Submission email is: " + result.getString("submission_email"));
-                        buffer.append("Questions: " + result.getString("questions") + "\n\n");
-                        Log.i(TAG, "Questions is: " + result.getString("questions"));
+                        String questionsArrayToString = "[";
+                        for (int i = 0; i < result.getArray("questions").count(); i++) {
+                            //questionsArrayToString += result.getArray("questions")[i];
+                            Log.i(TAG, "Checking result.getArray(questions) at index " + i);
+                            Log.i(TAG, "question_num is: " + result.getArray("questions").getDictionary(i).getInt("question_num"));
+                            Log.i(TAG, "question_num is: " + result.getArray("questions").getDictionary(i).getDictionary("options"));
+                            Log.i(TAG, "question_num is: " + result.getArray("questions").getDictionary(i).getString("description"));
+                        }
+                        buffer.append("Questions: " + result.getArray("questions") + "\n\n"); //this is an array of dictionaries
+                        Log.i(TAG, "Questions is: " + result.getArray("questions"));
                     }
 
                     //Show all data
@@ -441,8 +490,54 @@ public class MainActivity extends AppCompatActivity {
         questionsDoc.setString("submission_email", emailString); //This is correct too
         questionsDoc.setArray("questions", questionsForDB); //This is how I set an array according to online doc
 
+        //The following 3 if statements are all correct
+
+        if (questionsDoc.contains("document_type")) {
+            Log.i("tag", "\nquestionsDoc contains document_type property");
+            Log.i("tag", "The value is " + questionsDoc.getString("document_type"));
+        } else {
+            Log.i("tag", "\nERROR: no such document_type property in questionsDoc");
+        }
+
+        if (questionsDoc.contains("submission_email")) {
+            Log.i("tag", "questionsDoc contains submission_email property");
+            Log.i("tag", "The value is " + questionsDoc.getString("submission_email"));
+        } else {
+            Log.i("tag", "ERROR: no such submission_email property in questionsDoc");
+        }
+
+        if (questionsDoc.contains("questions")) {
+            Log.i("tag", "questionsDoc contains questions property");
+            Log.i("tag", "The array is "  +questionsDoc.getArray("questions"));
+        } else {
+            Log.i("tag", "ERROR: no such questionsDoc property in questionsDoc");
+        }
+
+        //This is correct too
+        Log.i("tag", "questionsDoc contains " + questionsDoc.count() + " elements\n");
+
+        //Saving a document should be done after document is populated
         try {
             database.save(questionsDoc); //this is how to save a document according to online doc
+            Log.i(TAG, "questionsDoc is saved to database");
+            ResultSet rs = QueryBuilder
+                    //.select(SelectResult.all()) //is there something wrong with SelectResult.all()?
+                    .select(SelectResult.all())
+                    .from(DataSource.database(database))
+                    .where(Expression.property("document_type").equalTo(Expression.string("questions")))
+                    .execute(); //is there something wrong with query.execute()?
+            //Log.i(TAG, "rs.allResults().get(0) is: " + rs.allResults().get(0));
+            //Log.i(TAG, "submission_email for rs.allResults().get(0) is: " + rs.allResults().get(0).getString("submission_email"));
+            StringBuffer buffer = new StringBuffer();
+            for (Result result : rs.allResults()) {
+                Log.i(TAG, "result is: " + result);
+                buffer.append("Document type: " + result.getString("document_type") + "\n");
+                Log.i(TAG, "Document type is: " + result.getString("document_type"));
+                buffer.append("Submission Email: " + result.getString("submission_email") + "\n");
+                Log.i(TAG, "Submission email is: " + result.getString("submission_email"));
+                buffer.append("Questions: " + result.getArray("questions") + "\n\n");
+                Log.i(TAG, "Questions is: " + result.getArray("questions"));
+            }
             //database.close(); //Do I need to close database?
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();

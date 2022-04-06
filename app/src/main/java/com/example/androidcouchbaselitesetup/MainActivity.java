@@ -1,5 +1,9 @@
 package com.example.androidcouchbaselitesetup;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -100,6 +104,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
+        ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            // There are no request codes
+                            Intent data = result.getData();
+                            Log.i(TAG, ".launch(intent) was triggered");
+                        }
+                    }
+                });
+
+        /*private val getResult =
+                registerForActivityResult(
+                        ActivityResultContracts.StartActivityForResult()) {
+            if(it.resultCode == Activity.RESULT_OK){
+                val value = it.data?.getStringExtra("input")
+            }
+        }*/
 
         // One-off initialization
         CouchbaseLite.init(cntx);
@@ -291,12 +317,14 @@ public class MainActivity extends AppCompatActivity {
 
                 intent.putExtra(EXAM_KEY, buttons); //have different keys
                 //Should have a method for receiving intent from Submission.java class?
-                startActivityForResult(intent, RESULT);
-                //startActivity(intent);
+                //startActivityForResult(intent, RESULT); //What's the alternative that I should use then?
+                startActivity(intent);
+                //someActivityResultLauncher.launch(intent);
+                Log.i(TAG, "someActivityResultLauncher was called");
 
                 //TODO
-                MutableDocument testDoc = new MutableDocument();
-                MutableArray answersForTestDoc = new MutableArray();
+                MutableDocument testDoc = new MutableDocument(); //this looks good
+                MutableArray answersForTestDoc = new MutableArray(); //this looks good
                 for (int i = 0; i < buttons.length; i++){
                     MutableDictionary studentAnswerDict = new MutableDictionary();
                     int question_num = i + 1;
@@ -317,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 testDoc.setString("document_type", "test");
+                testDoc.setString("submission_email", emailString);
                 testDoc.setArray("answers", answersForTestDoc);
 
                 try {
@@ -327,6 +356,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
+
         });
 
         mViewQuestionData.setOnClickListener(new View.OnClickListener() {
@@ -362,12 +392,22 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i < result.getArray("questions").count(); i++) {
                             //questionsArrayToString += result.getArray("questions")[i];
                             Log.i(TAG, "Checking result.getArray(questions) at index " + i);
+                            questionsArrayToString += "(";
+                            questionsArrayToString += result.getArray("questions").getDictionary(i).getInt("question_num");
                             Log.i(TAG, "question_num is: " + result.getArray("questions").getDictionary(i).getInt("question_num"));
+                            questionsArrayToString += ", ";
+                            questionsArrayToString += result.getArray("questions").getDictionary(i).getDictionary("options");
                             Log.i(TAG, "question_num is: " + result.getArray("questions").getDictionary(i).getDictionary("options"));
+                            questionsArrayToString += ", ";
+                            questionsArrayToString += result.getArray("questions").getDictionary(i).getString("description");
                             Log.i(TAG, "question_num is: " + result.getArray("questions").getDictionary(i).getString("description"));
+                            questionsArrayToString += ")";
                         }
-                        buffer.append("Questions: " + result.getArray("questions") + "\n\n"); //this is an array of dictionaries
-                        Log.i(TAG, "Questions is: " + result.getArray("questions"));
+                        questionsArrayToString += "]";
+                        buffer.append("Questions: " + questionsArrayToString + "\n\n"); //this is an array of dictionaries
+                        Log.i(TAG, "Questions is: " + questionsArrayToString);
+                        //buffer.append("Questions: " + result.getArray("questions") + "\n\n"); //this is an array of dictionaries
+                        //Log.i(TAG, "Questions is: " + result.getArray("questions"));
                     }
 
                     //Show all data
@@ -381,16 +421,29 @@ public class MainActivity extends AppCompatActivity {
         mViewAnswerKeyData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Query query = QueryBuilder
+                /*Query query = QueryBuilder
                         .select(SelectResult.all())
                         .from(DataSource.database(database))
-                        .where(Expression.property("document_type").equalTo(Expression.string("answerKey")));
+                        .where(Expression.property("document_type").equalTo(Expression.string("answerKey")));*/
 
                 try {
-                    ResultSet rs = query.execute();
+                    ResultSet rs = QueryBuilder
+                            .select(SelectResult.property("answers"))
+                            .from(DataSource.database(database))
+                            .where(Expression.property("document_type").equalTo(Expression.string("answerKey")))
+                            .execute();
                     StringBuffer buffer = new StringBuffer();
-                    for (Result result : rs) {
-                        buffer.append("Answers: " + result.getString("answers") + "\n\n");
+                    for (Result result : rs.allResults()) {
+                        String answersArrayToString = "[";
+                        for (int i = 0; i < result.getArray("answers").count(); i++) {
+                            answersArrayToString += "(";
+                            answersArrayToString += result.getArray("answers").getDictionary(i).getInt("question_num");
+                            answersArrayToString += ", ";
+                            answersArrayToString += result.getArray("answers").getDictionary(i).getString("answer");
+                            answersArrayToString += ")";
+                        }
+                        answersArrayToString += "]";
+                        buffer.append("Answers: " + answersArrayToString + "\n\n");
                     }
 
                     //Show all data
@@ -404,16 +457,32 @@ public class MainActivity extends AppCompatActivity {
         mViewTestData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Query query = QueryBuilder
+                /*Query query = QueryBuilder
                         .select(SelectResult.all())
                         .from(DataSource.database(database))
-                        .where(Expression.property("document_type").equalTo(Expression.string("test")));
+                        .where(Expression.property("document_type").equalTo(Expression.string("test")));*/
 
                 try {
-                    ResultSet rs = query.execute();
+                    ResultSet rs = QueryBuilder
+                            .select(
+                                    SelectResult.property("submission_email"),
+                                    SelectResult.property("answers"))
+                            .from(DataSource.database(database))
+                            .where(Expression.property("document_type").equalTo(Expression.string("test")))
+                            .execute();
                     StringBuffer buffer = new StringBuffer();
                     for (Result result : rs) {
-                        buffer.append("Answers: " + result.getString("answers") + "\n\n");
+                        buffer.append("Submission Email: " + result.getString("submission_email") + "\n");
+                        String answersArrayToString = "[";
+                        for (int i = 0; i < result.getArray("answers").count(); i++) {
+                            answersArrayToString += "(";
+                            answersArrayToString += result.getArray("answers").getDictionary(i).getInt("question_num");
+                            answersArrayToString += ", ";
+                            answersArrayToString += result.getArray("answers").getDictionary(i).getString("answer");
+                            answersArrayToString += ")";
+                        }
+                        answersArrayToString += "]";
+                        buffer.append("Answers: " + answersArrayToString + "\n\n");
                     }
 
                     //Show all data
@@ -543,6 +612,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        Log.i("tag", "Now about to insert answerKey");
         if(questions != null && questions.size() > 0)
             mQuestionTextView.setText("" + (mCurrentQuestionIndex + 1) + ") " +
                     questions.get(mCurrentQuestionIndex).toString());
@@ -564,10 +634,12 @@ public class MainActivity extends AppCompatActivity {
 
         MutableArray answersForDB = new MutableArray();
 
+        Log.i("tag", "Printing out each question's answerString");
         for (int i = 0; i < answers.size(); i++) {
             MutableDictionary answerForDB = new MutableDictionary();
             int question_num = i+1;
             String answerString = answers.get(i).getAnswerString();
+            Log.i("tag", "answerString is: " + answerString);
 
             answerForDB.setInt("question_num", question_num);
             answerForDB.setString("answer", answerString);

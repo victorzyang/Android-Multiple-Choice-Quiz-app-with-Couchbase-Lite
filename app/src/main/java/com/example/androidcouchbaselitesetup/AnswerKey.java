@@ -45,15 +45,19 @@ public class AnswerKey {
                             }
                         }else if (xpp.getName().equals("answer")){
                             thisIsAnAnswer = true;
+                            Log.i(XML_ANSWER_KEY, "thisIsAnAnswer is set to true");
                         }
                     case XmlPullParser.TEXT:
                         Log.i(XML_ANSWER_KEY, "TEXT: " + xpp.getText());
-                        if(thisIsAnAnswer == true){
+                        Log.i(XML_ANSWER_KEY, "Is this an answer? " + thisIsAnAnswer);
+                        if(thisIsAnAnswer == true && xpp.getText() != null){
                             answer_text = xpp.getText();
 
                             thisIsAnAnswer = false;
+                            Log.i(XML_ANSWER_KEY, "thisIsAnAnswer is reset to false");
 
                             answer = new Answer(answer_text, contributorName);
+                            Log.i(XML_ANSWER_KEY, "The string of the answer to be added is: " + answer.getAnswerString());
                             answers.add(answer);
                         }
                         break;
@@ -71,6 +75,12 @@ public class AnswerKey {
             e.printStackTrace();
         }catch(java.io.IOException e){
             e.printStackTrace();
+        }
+
+        //print out answers
+        for (int i = 0; i < answers.size(); i++) {
+            String answerText = answers.get(i).getAnswerString();
+            Log.i(XML_ANSWER_KEY, "answerText at index " + i + " is: " + answerText);
         }
 
         return answers;

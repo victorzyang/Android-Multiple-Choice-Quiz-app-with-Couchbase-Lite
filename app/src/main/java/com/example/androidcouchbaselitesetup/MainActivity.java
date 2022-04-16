@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mQuestionTextView;
     private ArrayList<Question> questions; //Have an arraylist of Questions, and each Question has 5 options and an answer
-    private ArrayList<Answer> answers; //Added for thesis
+    private ArrayList<Answer> answers; //Have an arraylist of Answers for each Question / Added for thesis
 
     private int mCurrentQuestionIndex; //used to determine which question user is on
     private static String QUESTION_INDEX_KEY = "question_index";
@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
     //private static String BUTTON_KEY = "button";
     //private boolean gameHasStarted = false; //something is wrong here...
 
-    private Context cntx = this; //for database?
-    Database database;
+    private Context cntx = this; //needed for database
+    Database database; //Database instance used for inserting and reading database data
     private String[] optionChars = {"A", "B", "C", "D", "E"};
 
     @Override
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         CouchbaseLite.init(cntx);
         Log.i(TAG,"Initialized CBL");
 
-        // Step 1: Create a database (this step looks ok?)
+        // Step 1: Create a database (this step looks ok)
         Log.i(TAG, "Starting DB");
         final DatabaseConfiguration cfg = new DatabaseConfiguration(); //Does this need to be final?
         cfg.setDirectory(cntx.getFilesDir().getAbsolutePath()); //Do I need to have this line?
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
             /*Document document =
                     database.getDocument(mutableDoc.getId());*/
-            Log.i(TAG, "I LOVE MISS KOBAYASHI");
+            //Log.i(TAG, "I LOVE MISS KOBAYASHI"); //debugging
 
             //Log.i(TAG, "document.getString() is: " + document.getString("type")); //this works
 
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Step 2: Create 3 new documents (i.e. a record) in the database. (Both of these docs here look ok according to online document)
         MutableDocument questionsDoc = new MutableDocument(); //for the questions
-        MutableDocument answerKeyDoc = new MutableDocument();
+        MutableDocument answerKeyDoc = new MutableDocument(); //for the AnswerKey
 
         //    MutableDocument mutableDoc =
         //      new MutableDocument().setFloat("version", 2.0f)
@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
                 //someActivityResultLauncher.launch(intent);
                 Log.i(TAG, "someActivityResultLauncher was called");
 
-                //TODO
+                //create document for student's test
                 MutableDocument testDoc = new MutableDocument(); //this looks good
                 MutableArray answersForTestDoc = new MutableArray(); //this looks good
                 for (int i = 0; i < buttons.length; i++){
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
                 testDoc.setArray("answers", answersForTestDoc);
 
                 try {
-                    database.save(testDoc);
+                    database.save(testDoc); //saves the student's test document to database
                     //database.close(); //Do I need to close database?
                 } catch (CouchbaseLiteException e) {
                     e.printStackTrace();
@@ -359,6 +359,9 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        //Following 3 methods below are for viewing the different tables in the database
+
+        //views the Questions table
         mViewQuestionData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -377,11 +380,11 @@ public class MainActivity extends AppCompatActivity {
                                     SelectResult.property("questions"))
                             .from(DataSource.database(database))
                             .where(Expression.property("document_type").equalTo(Expression.string("questions")))
-                            .execute(); //is there something wrong with query.execute()?
+                            .execute(); //query for getting all question documents
                     //Log.i(TAG, "rs.allResults().get(0) is: " + rs.allResults().get(0));
                     //Log.i(TAG, "submission_email for rs.allResults().get(0) is: " + rs.allResults().get(0).getString("submission_email"));
                     StringBuffer buffer = new StringBuffer();
-                    Log.i(TAG, "LOU IS THE BEST");
+                    Log.i(TAG, "LOU IS THE BEST"); //debugging
                     for (Result result : rs.allResults()) {
                         /*Log.i(TAG, "result is: " + result);
                         buffer.append("Document type: " + result.getString("document_type") + "\n");
@@ -418,6 +421,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //views the AnswerKey table
         mViewAnswerKeyData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -431,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
                             .select(SelectResult.property("answers"))
                             .from(DataSource.database(database))
                             .where(Expression.property("document_type").equalTo(Expression.string("answerKey")))
-                            .execute();
+                            .execute(); //query for getting all question documents
                     StringBuffer buffer = new StringBuffer();
                     for (Result result : rs.allResults()) {
                         String answersArrayToString = "[";
@@ -454,6 +458,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //views the Students' Test table
         mViewTestData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -469,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
                                     SelectResult.property("answers"))
                             .from(DataSource.database(database))
                             .where(Expression.property("document_type").equalTo(Expression.string("test")))
-                            .execute();
+                            .execute(); //query for getting all question documents
                     StringBuffer buffer = new StringBuffer();
                     for (Result result : rs) {
                         buffer.append("Submission Email: " + result.getString("submission_email") + "\n");
@@ -520,10 +525,12 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "Email is: " + emailString);
 
         //insert questions here
-        MutableArray questionsForDB = new MutableArray(); //this is how to create an array according to online doc (and the contents look alright to me too?)
+
+        MutableArray questionsForDB = new MutableArray(); //this is how to create an array according to online doc (and the contents look alright to me too)
 
         //Log.i(TAG, "Debugging by iterating through questions");
 
+        //iterate through all questions to add to the Question table in database
         for (int i = 0; i < questions.size(); i++){
             //create a dictionary for each question, which will be inserted into an array
             MutableDictionary questionDict = new MutableDictionary(); //this is how to create dictionary according to online doc
@@ -549,7 +556,6 @@ public class MainActivity extends AppCompatActivity {
             questionsForDB.addDictionary(questionDict); //This should be how to add a dictionary to an array
         }
 
-        //TODO: try iterating through the questionsForDB array?
         for (int i = 0; i < questionsForDB.count(); i++)
         {
             Log.i("tag", "Item " + i + " = " + questionsForDB.getDictionary(i));
@@ -559,7 +565,7 @@ public class MainActivity extends AppCompatActivity {
         questionsDoc.setString("submission_email", emailString); //This is correct too
         questionsDoc.setArray("questions", questionsForDB); //This is how I set an array according to online doc
 
-        //The following 3 if statements are all correct
+        //The following 3 if statements are all correct (for debugging)
 
         if (questionsDoc.contains("document_type")) {
             Log.i("tag", "\nquestionsDoc contains document_type property");
@@ -585,7 +591,7 @@ public class MainActivity extends AppCompatActivity {
         //This is correct too
         Log.i("tag", "questionsDoc contains " + questionsDoc.count() + " elements\n");
 
-        //Saving a document should be done after document is populated
+        //Saving a document (which is done after document is populated)
         try {
             database.save(questionsDoc); //this is how to save a document according to online doc
             Log.i(TAG, "questionsDoc is saved to database");
@@ -617,7 +623,7 @@ public class MainActivity extends AppCompatActivity {
             mQuestionTextView.setText("" + (mCurrentQuestionIndex + 1) + ") " +
                     questions.get(mCurrentQuestionIndex).toString());
 
-        //insert answerkey data here
+        //insert answerkey data into Answer Key table here
 
         ArrayList<Answer> parsedModel_Answers = null;
         try {
@@ -651,7 +657,7 @@ public class MainActivity extends AppCompatActivity {
         answerKeyDoc.setArray("answers", answersForDB);
 
         try {
-            database.save(answerKeyDoc);
+            database.save(answerKeyDoc); //saves answerKey document to database
             //database.close(); //Do I need to close database?
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
@@ -768,6 +774,7 @@ public class MainActivity extends AppCompatActivity {
         mButtonE.setBackgroundColor(Color.GRAY);
     }
 
+    //method for displaying an alert showing data from a database table
     private void showMessage(String title, String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);

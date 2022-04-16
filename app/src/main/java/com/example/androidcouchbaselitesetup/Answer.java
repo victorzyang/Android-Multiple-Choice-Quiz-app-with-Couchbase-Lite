@@ -1,5 +1,6 @@
 package com.example.androidcouchbaselitesetup;
 
+//This class was added for thesis
 public class Answer {
 
     private String mAnswerString;
@@ -18,6 +19,7 @@ public class Answer {
             mContributor = "anonymous";
     }
 
+    //getter for the Answer
     public String getAnswerString(){return mAnswerString;}
 
     public String toString(){ //displays the current question answer to UI

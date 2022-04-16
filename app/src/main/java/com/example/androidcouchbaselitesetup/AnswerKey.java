@@ -9,6 +9,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 
+//This class was added for thesis
 public class AnswerKey {
 
     public static final String XML_ANSWER_KEY = "answer_key";

@@ -137,11 +137,12 @@ public class MainActivity extends AppCompatActivity {
         cfg.setDirectory(cntx.getFilesDir().getAbsolutePath()); //Do I need to have this line?
         database = null;
         try {
+            Log.i(TAG, "Database created");
             database = new Database(  "testDb2", cfg);
-            MutableDocument mutableDoc = //test
+            /*MutableDocument mutableDoc = //test
                     new MutableDocument().setFloat("version", 2.0f)
                             .setString("type", "SDK");
-            database.save(mutableDoc);
+            database.save(mutableDoc);*/
 
             /*Document document =
                     database.getDocument(mutableDoc.getId());*/
@@ -149,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
             //Log.i(TAG, "document.getString() is: " + document.getString("type")); //this works
 
-            ResultSet rs =
+            /*ResultSet rs =
                     QueryBuilder.select(
                             SelectResult.property("type"),
                             SelectResult.property("version"))
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             for (Result result : rs) {
                 Log.i(TAG, String.format("type is -> %s", result.getString("type")));
                 Log.i(TAG, String.format("version is -> %s", result.getFloat("version")));
-            }
+            }*/
 
             /*List<Result> listOfResults = rs.allResults();
 
@@ -349,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
                 testDoc.setArray("answers", answersForTestDoc);
 
                 try {
+                    Log.i(TAG, "Student test saved to database");
                     database.save(testDoc); //saves the student's test document to database
                     //database.close(); //Do I need to close database?
                 } catch (CouchbaseLiteException e) {
@@ -361,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Following 3 methods below are for viewing the different tables in the database
 
-        //views the Questions table
+        //views the Questions
         mViewQuestionData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -384,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
                     //Log.i(TAG, "rs.allResults().get(0) is: " + rs.allResults().get(0));
                     //Log.i(TAG, "submission_email for rs.allResults().get(0) is: " + rs.allResults().get(0).getString("submission_email"));
                     StringBuffer buffer = new StringBuffer();
-                    Log.i(TAG, "LOU IS THE BEST"); //debugging
+                    Log.i(TAG, "Getting all questions from database");
                     for (Result result : rs.allResults()) {
                         /*Log.i(TAG, "result is: " + result);
                         buffer.append("Document type: " + result.getString("document_type") + "\n");
@@ -437,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
                             .where(Expression.property("document_type").equalTo(Expression.string("answerKey")))
                             .execute(); //query for getting all question documents
                     StringBuffer buffer = new StringBuffer();
+                    Log.i(TAG, "Getting all answers from database");
                     for (Result result : rs.allResults()) {
                         String answersArrayToString = "[";
                         for (int i = 0; i < result.getArray("answers").count(); i++) {
@@ -476,6 +479,7 @@ public class MainActivity extends AppCompatActivity {
                             .where(Expression.property("document_type").equalTo(Expression.string("test")))
                             .execute(); //query for getting all question documents
                     StringBuffer buffer = new StringBuffer();
+                    Log.i(TAG, "Getting all tests from database");
                     for (Result result : rs) {
                         buffer.append("Submission Email: " + result.getString("submission_email") + "\n");
                         String answersArrayToString = "[";
@@ -593,6 +597,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Saving a document (which is done after document is populated)
         try {
+            Log.i(TAG, "Inserting questions Doc into database");
             database.save(questionsDoc); //this is how to save a document according to online doc
             Log.i(TAG, "questionsDoc is saved to database");
             ResultSet rs = QueryBuilder
@@ -657,6 +662,7 @@ public class MainActivity extends AppCompatActivity {
         answerKeyDoc.setArray("answers", answersForDB);
 
         try {
+            Log.i(TAG, "Inserting answerKeyDoc into database");
             database.save(answerKeyDoc); //saves answerKey document to database
             //database.close(); //Do I need to close database?
         } catch (CouchbaseLiteException e) {

@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/741198334/AndroidCouchbaseLiteSetup.iml" filepath="$PROJECT_DIR$/.idea/modules/741198334/AndroidCouchbaseLiteSetup.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidCouchbaseLiteSetup.app.unitTest.iml" />
     </modules>
   </component>
 </project>
